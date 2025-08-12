@@ -1,0 +1,23 @@
+[project]
+name = "hcls-research-agent"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "maxtsc",email = "mtschochohei@google.com"}
+]
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "google-adk (>=1.10.0,<2.0.0)",
+    "biopython (>=1.85,<2.0)",
+    "pytest (>=8.4.1,<9.0.0)",
+    "pytest-asyncio (>=1.1.0,<2.0.0)"
+]
+
+[tool.poetry]
+packages = [{include = "hcls_research_agent", from = "src"}]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
