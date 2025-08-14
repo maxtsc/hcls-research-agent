@@ -51,6 +51,6 @@ Hypothesis 3: The neuroprotective effect of Lactobacillus supplementation in pat
 
 
 ***Your Input***
-Research Question: research_question
-Pubmed Results: pubmed_results
+Research Question: {research_question}
+Pubmed Results: {pubmed_results}
 """

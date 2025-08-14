@@ -20,6 +20,8 @@ from .sub_agents.research_question_agent import research_question_agent
 from .sub_agents.hypothesis_agent import hypothesis_agent
 from .sub_agents.search_agent import search_agent
 
+from . import prompt
+
 
 hcls_researcher = LlmAgent(
     name='hcls_research_agent',
@@ -28,9 +30,7 @@ hcls_researcher = LlmAgent(
         'Creates research hypotheses for research questions'
         ' based on pubmed search results.'
     ),
-    instruction=('Route user requests: You first route to the research_question_agent to define the research question.'
-    'Once a research question is defined, you route to the search_agent to conduct a pubmed search.'
-    'Once pubmed_results are available, you route to the hypothesis_agent to generate hypotheses.'),
+    instruction=prompt.ROOT_PROMPT,
     sub_agents=[research_question_agent, search_agent, hypothesis_agent],
 )
 

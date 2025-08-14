@@ -90,4 +90,5 @@ search_agent = Agent(
     name='search_agent',
     instruction=prompt.SEARCH_PROMPT,
     tools=[search_pubmed],
+    output_key="pubmed_results"
 )

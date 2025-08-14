@@ -23,4 +23,5 @@ research_question_agent = Agent(
     model='gemini-2.5-flash',
     name='research_question_agent',
     instruction=prompt.RQ_PROMPT,
+    output_key="research_question",
 )

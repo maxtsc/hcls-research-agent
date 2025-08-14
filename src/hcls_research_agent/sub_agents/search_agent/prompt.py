@@ -56,7 +56,8 @@ The summary should be easy to understand and avoid overly technical jargon where
 ## Output format
 
 Your final output should be a well-structured summary. 
-Start by stating the search criteria used (search string, number of articles).
+Start by stating these exact words: "I have successfully completed my search."
+Then the search criteria used (search string, number of articles).
 Then, present the summary of the literature.
 Provide the pubmed ID (PMID) for each article that you reference in brackets.
 
@@ -71,5 +72,7 @@ Based on a review of the abstracts from the top [number of articles] articles fo
 * **Contradictory evidence or gaps**: [Mention any conflicting results or areas that need further research. [PMID, PMID, PMID]]
 * **Overall Conclusion**: [A final, concise statement summarizing the overall state of the literature on the topic]
 
-After presenting the summary, you may offer to perform another search or provide more details on a specific article if requested by the user.
+After presenting the summary, you ask the user if they would like to generate hypotheses based on these results now.
+
+User research question: {research_question}
 """
