@@ -14,29 +14,30 @@
 
 """Unit tests for routing agent."""
 
-import pytest
-import dotenv
 import logging
 
+import dotenv
+import pytest
 from google.adk.runners import InMemoryRunner
 from google.genai.types import Part, UserContent
 
 from agents.hcls_research_agent.agent import root_agent
 
 pytest_plugins = ("pytest_asyncio",)
-logger = logging.Logger("test_loggger")
+
 
 @pytest.fixture(scope="session", autouse=True)
 def load_env():
     dotenv.load_dotenv()
+
 
 @pytest.mark.asyncio
 async def test_route_research_question():
     """Test that the router to the research question works."""
     user_input = [
         "My research question is: How much water should I drink per day?",
-        "Please refine it further"
-        ]
+        "Please refine it further",
+    ]
 
     runner = InMemoryRunner(agent=root_agent)
     session = await runner.session_service.create_session(
@@ -52,9 +53,11 @@ async def test_route_research_question():
             if event.content.parts and event.content.parts[0].function_call:
                 routed_agent = event.content.parts[0].function_call.args
 
-
     # The input should route to the research_question_agent.
-    assert "research_question_agent" in str(routed_agent).lower(), "Expected routing to research_question_agent, got {routed_agent}"
+    assert "research_question_agent" in str(routed_agent).lower(), (
+        "Expected routing to research_question_agent, got {routed_agent}"
+    )
+
 
 @pytest.mark.asyncio
 async def test_route_search_agent():
@@ -69,9 +72,7 @@ async def test_route_search_agent():
     session = await runner.session_service.create_session(
         app_name=runner.app_name, user_id="test_user"
     )
-    mock_output = {
-        "research_question": "Precision therapy for HER2-low breast cancer"
-    }
+    mock_output = {"research_question": "Precision therapy for HER2-low breast cancer"}
 
     for message in user_input:
         content = UserContent(parts=[Part(text=message)])
@@ -85,28 +86,30 @@ async def test_route_search_agent():
                 routed_agent = event.content.parts[0].function_call.args
 
     # The input should route to the search_agent.
-    assert "search_agent" in str(routed_agent).lower(), f"Expected routing to search_agent, got {routed_agent}"
+    assert "search_agent" in str(routed_agent).lower(), (
+        f"Expected routing to search_agent, got {routed_agent}"
+    )
 
 
 @pytest.mark.asyncio
 async def test_route_hypothesis_agent():
-    """Test that the router to the hypothesis agent works.
-    """
-    user_input = {
-        "My very good research question is: What is the impact of T-DXd on progression-free survival on HER2-low breast cancer?",
-        """Please start pubmed search with ("trastuzumab deruxtecan" OR "T-DXd") AND ("new indications" OR "potential indications" OR "other cancers" OR "unmet need" , my email address is test@gmail.com """,
-        "Please create hypotheses",
-    }
+    """Test that the router to the hypothesis agent works."""
+    start = "My very good research question is: What is the impact of T-DXd on progression-free survival on HER2-low breast cancer?"
+    research_question_input = "Yes, please use this research question."
+    pubmed_search_input = """Please start pubmed search with ("trastuzumab deruxtecan" OR "T-DXd") AND ("new indications" OR "potential indications" OR "other cancers" OR "unmet need") my email address is test@gmail.com """
+    iterations = 6
     runner = InMemoryRunner(agent=root_agent)
     session = await runner.session_service.create_session(
         app_name=runner.app_name, user_id="test_user"
     )
     mock_output = {
         "research_question": "Are there underexplored disease entities from trastuzumab deruxtectan where it's currently not an approved therapy?",
-        "pubmed_results": "The literature review indicates that while trastuzumab deruxtecan is well-established in certain HER2-expressing cancers, there is emerging evidence supporting its potential in underexplored, aggressive rare cancers such as Salivary Duct Carcinoma and Desmoplastic Small Round Cell Tumors."
+        "pubmed_results": "The literature review indicates that while trastuzumab deruxtecan is well-established in certain HER2-expressing cancers, there is emerging evidence supporting its potential in underexplored, aggressive rare cancers such as Salivary Duct Carcinoma and Desmoplastic Small Round Cell Tumors.",
     }
-    for message in user_input:
-        content = UserContent(parts=[Part(text=message)])
+    content = UserContent(parts=[Part(text=start)])
+    prev_agent = "start"
+
+    while iterations > 0:
         async for event in runner.run_async(
             user_id=session.user_id,
             session_id=session.id,
@@ -114,7 +117,33 @@ async def test_route_hypothesis_agent():
             state_delta=mock_output,
         ):
             if event.content.parts and event.content.parts[0].function_call:
-                routed_agent = event.content.parts[0].function_call.args
+                if "research_question_agent" in str(
+                    event.content.parts[0].function_call.args
+                ):
+                    if prev_agent in ("start"):
+                        content = UserContent(
+                            parts=[Part(text=research_question_input)]
+                        )
+                        prev_agent = "research_question_agent"
+
+                elif "search_agent" in str(event.content.parts[0].function_call.args):
+                    if prev_agent in ("research_question_agent", "start"):
+                        prev_agent = "search_agent"
+                        content = UserContent(parts=[Part(text=pubmed_search_input)])
+
+                elif "hypothesis_agent" in str(
+                    event.content.parts[0].function_call.args
+                ):
+                    routed_agent = event.content.parts[0].function_call.args
+                    break
+
+                else:
+                    content = UserContent(parts=[Part(text="Yes. Please proceed to the next step.")])
+        iterations -= 1
+        if iterations == 0:
+            routed_agent = "Was not able to route to hypothesis in six turns."
 
     # The input should route to the search_agent.
-    assert "hypothesis_agent" in str(routed_agent).lower(), f"Expected routing to hypothesis_agent, got {routed_agent}."
+    assert "hypothesis_agent" in str(routed_agent).lower(), (
+        f"Expected routing to hypothesis_agent, got {routed_agent}."
+    )
