@@ -20,9 +20,9 @@ from google.adk.models import LlmResponse
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
 from google.genai.types import Content, Part
-from hcls_research_agent.sub_agents.hypothesis_agent.agent import \
-    hypothesis_agent
-
+from agents.hcls_research_agent.sub_agents.hypothesis_agent.agent import (
+    hypothesis_agent,
+)
 import pytest
 
 

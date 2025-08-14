@@ -20,8 +20,9 @@ from google.adk.models import LlmResponse
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
 from google.genai.types import Content, Part
-from hcls_research_agent.sub_agents.search_agent.agent import \
-    search_agent
+from agents.hcls_research_agent.sub_agents.search_agent.agent import (
+    search_agent,
+)
 
 import pytest
 
@@ -56,7 +57,7 @@ async def test_successful_search():
         ]
 
     with patch(
-        "hcls_research_agent.sub_agents.search_agent.agent.search_pubmed",
+        "agents.hcls_research_agent.sub_agents.search_agent.agent.search_pubmed",
         new=mock_search_pubmed,
     ):
         # Mock the LLM response
@@ -107,7 +108,7 @@ async def test_no_articles_found():
         return ["Could not find any articles"]
 
     with patch(
-        "hcls_research_agent.sub_agents.search_agent.agent.search_pubmed",
+        "agents.hcls_research_agent.sub_agents.search_agent.agent.search_pubmed",
         new=mock_search_pubmed,
     ):
         # Mock the LLM response
@@ -158,7 +159,7 @@ async def test_connection_error():
         return ["Error connecting to Pubmed"]
 
     with patch(
-        "hcls_research_agent.sub_agents.search_agent.agent.search_pubmed",
+        "agents.hcls_research_agent.sub_agents.search_agent.agent.search_pubmed",
         new=mock_search_pubmed,
     ):
         # Mock the LLM response

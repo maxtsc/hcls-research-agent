@@ -21,7 +21,7 @@ import logging
 from google.adk.runners import InMemoryRunner
 from google.genai.types import Part, UserContent
 
-from hcls_research_agent.agent import root_agent
+from agents.hcls_research_agent.agent import root_agent
 
 pytest_plugins = ("pytest_asyncio",)
 logger = logging.Logger("test_loggger")
@@ -93,11 +93,9 @@ async def test_route_hypothesis_agent():
     """Test that the router to the hypothesis agent works.
     """
     user_input = {
-        "What is the mechanistic basis for exploring novel disease indications for trastuzumab deruxtecan beyond its currently approved uses, focusing on areas with limited clinical investigation?",
-        "Yes",
-        "Yes, please start pubmed search with (\"trastuzumab deruxtecan\" OR \"T-DXd\") AND (\"new indications\" OR \"potential indications\" OR \"other cancers\" OR \"unmet need\" ",
-        "test@gmail.com",
-        "Yes, please create hypotheses",
+        "My very good research question is: What is the impact of T-DXd on progression-free survival on HER2-low breast cancer?",
+        """Please start pubmed search with ("trastuzumab deruxtecan" OR "T-DXd") AND ("new indications" OR "potential indications" OR "other cancers" OR "unmet need" , my email address is test@gmail.com """,
+        "Please create hypotheses",
     }
     runner = InMemoryRunner(agent=root_agent)
     session = await runner.session_service.create_session(
@@ -115,7 +113,6 @@ async def test_route_hypothesis_agent():
             new_message=content,
             state_delta=mock_output,
         ):
-            logger.warning(event.content.parts[0])
             if event.content.parts and event.content.parts[0].function_call:
                 routed_agent = event.content.parts[0].function_call.args
 
