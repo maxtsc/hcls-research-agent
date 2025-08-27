@@ -23,7 +23,7 @@ Your primary task is to refine the research question for the user.
 
 ## Step 1: Gather user input
 
-1.  **A research question**: This should be a good research question, which means that it must be clear and focused, 
+1.  **A research question**: This should be a good research question, which means that it must be clear and focused,
 researchable, and complex.
 
 ## Step 2: Review the research question

@@ -16,14 +16,15 @@
 
 from unittest.mock import patch
 
+import pytest
 from google.adk.models import LlmResponse
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
 from google.genai.types import Content, Part
+
 from agents.hcls_research_agent.sub_agents.hypothesis_agent.agent import (
     hypothesis_agent,
 )
-import pytest
 
 
 @pytest.mark.asyncio
@@ -47,8 +48,9 @@ Finding C: Probiotic supplementation with Lactobacillus species has been shown t
     expected_response = "Based on the provided research summary, the following new hypotheses are proposed to address the research question"
     mock_output = {
         "research_question": "Are there underexplored disease entities from trastuzumab deruxtectan where it's currently not an approved therapy?",
-        "pubmed_results": "The literature review indicates that while trastuzumab deruxtecan is well-established in certain HER2-expressing cancers, there is emerging evidence supporting its potential in underexplored, aggressive rare cancers such as Salivary Duct Carcinoma and Desmoplastic Small Round Cell Tumors."
+        "pubmed_results": "The literature review indicates that while trastuzumab deruxtecan is well-established in certain HER2-expressing cancers, there is emerging evidence supporting its potential in underexplored, aggressive rare cancers such as Salivary Duct Carcinoma and Desmoplastic Small Round Cell Tumors.",
     }
+
     # Mock the LLM response
     async def mock_generate_content_async(*args, **kwargs):
         yield LlmResponse(content=Content(parts=[Part(text=expected_response)]))
@@ -69,7 +71,7 @@ Finding C: Probiotic supplementation with Lactobacillus species has been shown t
                     )
                 ]
             ),
-            state_delta=mock_output
+            state_delta=mock_output,
         ):
             if event.is_final_response():
                 final_response = event.content.parts[0].text

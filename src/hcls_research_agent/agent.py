@@ -16,19 +16,17 @@
 
 from google.adk.agents import LlmAgent
 
-from .sub_agents.research_question_agent import research_question_agent
+from . import prompt
 from .sub_agents.hypothesis_agent import hypothesis_agent
+from .sub_agents.research_question_agent import research_question_agent
 from .sub_agents.search_agent import search_agent
 
-from . import prompt
-
-
 hcls_researcher = LlmAgent(
-    name='hcls_research_agent',
-    model='gemini-2.5-flash',
+    name="hcls_research_agent",
+    model="gemini-2.5-flash",
     description=(
-        'Creates research hypotheses for research questions'
-        ' based on pubmed search results.'
+        "Creates research hypotheses for research questions"
+        " based on pubmed search results."
     ),
     instruction=prompt.ROOT_PROMPT,
     sub_agents=[research_question_agent, search_agent, hypothesis_agent],

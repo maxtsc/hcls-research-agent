@@ -16,15 +16,15 @@
 
 from unittest.mock import patch
 
+import pytest
 from google.adk.models import LlmResponse
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
 from google.genai.types import Content, Part
+
 from agents.hcls_research_agent.sub_agents.search_agent.agent import (
     search_agent,
 )
-
-import pytest
 
 
 @pytest.mark.asyncio
@@ -43,9 +43,7 @@ async def test_successful_search():
     email = "test@example.com"
     limit = 5
     expected_response = "I have successfully completed my search."
-    mock_output = {
-        "research_question": "Precision therapy for HER2-low breast cancer"
-    }
+    mock_output = {"research_question": "Precision therapy for HER2-low breast cancer"}
 
     # Mock the search_pubmed tool
     async def mock_search_pubmed(*args, **kwargs):
@@ -73,7 +71,7 @@ async def test_successful_search():
             async for event in runner.run_async(
                 session_id=session.id,
                 user_id=session.user_id,
-                new_message=Content(parts=[Part(text=f'{question}\n{email}\n{limit}')]),
+                new_message=Content(parts=[Part(text=f"{question}\n{email}\n{limit}")]),
                 state_delta=mock_output,
             ):
                 if event.is_final_response():
@@ -100,9 +98,8 @@ async def test_no_articles_found():
     email = "test@example.com"
     limit = 5
     expected_response = "Could not find any articles"
-    mock_output = {
-        "research_question": "Precision therapy for HER2-low breast cancer"
-    }
+    mock_output = {"research_question": "Precision therapy for HER2-low breast cancer"}
+
     # Mock the search_pubmed tool
     async def mock_search_pubmed(*args, **kwargs):
         return ["Could not find any articles"]
@@ -124,7 +121,7 @@ async def test_no_articles_found():
             async for event in runner.run_async(
                 session_id=session.id,
                 user_id=session.user_id,
-                new_message=Content(parts=[Part(text=f'{question}\n{email}\n{limit}')]),
+                new_message=Content(parts=[Part(text=f"{question}\n{email}\n{limit}")]),
                 state_delta=mock_output,
             ):
                 if event.is_final_response():
@@ -151,9 +148,8 @@ async def test_connection_error():
     email = "test@example.com"
     limit = 5
     expected_response = "Error connecting to Pubmed"
-    mock_output = {
-        "research_question": "Precision therapy for HER2-low breast cancer"
-    }
+    mock_output = {"research_question": "Precision therapy for HER2-low breast cancer"}
+
     # Mock the search_pubmed tool
     async def mock_search_pubmed(*args, **kwargs):
         return ["Error connecting to Pubmed"]
@@ -175,7 +171,7 @@ async def test_connection_error():
             async for event in runner.run_async(
                 session_id=session.id,
                 user_id=session.user_id,
-                new_message=Content(parts=[Part(text=f'{question}\n{email}\n{limit}')]),
+                new_message=Content(parts=[Part(text=f"{question}\n{email}\n{limit}")]),
                 state_delta=mock_output,
             ):
                 if event.is_final_response():

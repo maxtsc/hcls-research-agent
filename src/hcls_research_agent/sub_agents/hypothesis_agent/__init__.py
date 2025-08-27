@@ -12,6 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Search agent for finding research on Pubmed."""
+"""Hypothesis agent for creating hypotheses based on pubmed research."""
 
-from .agent import search_agent
+from .agent import hypothesis_agent as hypothesis_agent

@@ -14,12 +14,16 @@
 
 """Search agent for retrieving and summarizing articles from pubmed."""
 
-from google.adk import Agent
-from Bio import Entrez, Medline
-from io import StringIO
 import time
+from io import StringIO
+
+import ssl
+import certifi
+from Bio import Entrez, Medline
+from google.adk import Agent
 
 from . import prompt
+
 
 def search_pubmed(
     search_string: str,
@@ -37,15 +41,22 @@ def search_pubmed(
     Returns:
         On success: A list of dictionaries with the PMID id as key and a dictionary of
         the Medline content as value.
-        On error: A list containing the error of the search, either "Error connecting to Pubmed" 
+        On error: A list containing the error of the search, either "Error connecting to Pubmed"
         or "Could not find any articles"
     """
     print(
         f"--- Tool called: Fetching {limit} articles for {search_string} via Pubmed API ---"
     )
+    try:
+        ssl_context = ssl.create_default_context(cafile=certifi.where())
+        ssl._create_default_https_context = lambda: ssl_context
+        print(f"SSL context configured to use CA bundle: {certifi.where()}")
+    except Exception as e:
+        print(f"Error configuring SSL context: {e}")
+
     # Always provide an email to identify yourself to the API.
     # This is a requirement from NCBI.
-    Entrez.email = email
+    Entrez.email = email  # type: ignore
 
     # Use Entrez.esearch to perform the search
     try:
@@ -54,41 +65,41 @@ def search_pubmed(
         handle.close()
     except ConnectionError as e:
         return [f"Error connecting to Pubmed: {e}"]
-    
-    
+
     records = []
 
     # If id_list is empty
     if not id_list:
         return ["Could not find any articles"]
 
-
     # Use Entrez.efetch to retrieve the full details of the articles
-    # Convert from 
+    # Convert from
     for id in id_list:
         try:
-            handle = Entrez.efetch(db="pubmed", id=id, rettype="medline", retmode="text")
+            handle = Entrez.efetch(
+                db="pubmed", id=id, rettype="medline", retmode="text"
+            )
             data = handle.read()
             handle.close()
             record = list(Medline.parse(StringIO(data)))
             records.append(
                 {
-                    "pmid":id,
-                    "article":record,
+                    "pmid": id,
+                    "article": record,
                 }
             )
         except ConnectionError as e:
             return [f"Error connecting to Pubmed: {e}"]
-    
 
         time.sleep(1)
 
     return records
 
+
 search_agent = Agent(
-    model='gemini-2.5-flash',
-    name='search_agent',
+    model="gemini-2.5-flash",
+    name="search_agent",
     instruction=prompt.SEARCH_PROMPT,
     tools=[search_pubmed],
-    output_key="pubmed_results"
+    output_key="pubmed_results",
 )

@@ -12,3 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Agent for revising user research questions."""
+
+from .agent import research_question_agent as research_question_agent

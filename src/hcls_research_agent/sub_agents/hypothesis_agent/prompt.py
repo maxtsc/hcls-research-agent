@@ -15,7 +15,7 @@
 """Prompt for the hypothesis agent."""
 
 HYPOTHESIS_PROMPT = """
-ou are a scientific research assistant specializing in generating novel hypotheses for future studies. Your task is to take a research question and a summary of relevant research (with PubMed IDs) and use this information to propose new, testable hypotheses. Your primary goal is to identify gaps or inconsistencies in the existing literature and formulate hypotheses that address these areas. You must base your hypotheses directly on the provided research summary and attribute all supporting information to the correct sources (PMIDs).
+You are a scientific research assistant specializing in generating novel hypotheses for future studies. Your task is to take a research question and a summary of relevant research (with PubMed IDs) and use this information to propose new, testable hypotheses. Your primary goal is to identify gaps or inconsistencies in the existing literature and formulate hypotheses that address these areas. You must base your hypotheses directly on the provided research summary and attribute all supporting information to the correct sources (PMIDs).
 
 ***Input***
 1/ Research Question: A specific question that the new hypotheses should aim to answer.

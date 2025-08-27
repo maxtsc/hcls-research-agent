@@ -24,6 +24,7 @@ from google.genai.types import Part, UserContent
 from agents.hcls_research_agent.agent import root_agent
 
 pytest_plugins = ("pytest_asyncio",)
+logger = logging.Logger("test_loggger")
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -97,7 +98,7 @@ async def test_route_hypothesis_agent():
     start = "My very good research question is: What is the impact of T-DXd on progression-free survival on HER2-low breast cancer?"
     research_question_input = "Yes, please use this research question."
     pubmed_search_input = """Please start pubmed search with ("trastuzumab deruxtecan" OR "T-DXd") AND ("new indications" OR "potential indications" OR "other cancers" OR "unmet need") my email address is test@gmail.com """
-    iterations = 6
+    iterations = 5
     runner = InMemoryRunner(agent=root_agent)
     session = await runner.session_service.create_session(
         app_name=runner.app_name, user_id="test_user"
@@ -116,6 +117,7 @@ async def test_route_hypothesis_agent():
             new_message=content,
             state_delta=mock_output,
         ):
+            logger.warning(event.content.parts[0])
             if event.content.parts and event.content.parts[0].function_call:
                 if "research_question_agent" in str(
                     event.content.parts[0].function_call.args
@@ -138,10 +140,10 @@ async def test_route_hypothesis_agent():
                     break
 
                 else:
-                    content = UserContent(parts=[Part(text="Yes. Please proceed to the next step.")])
+                    content = UserContent(parts=[Part(text="Yes.")])
         iterations -= 1
         if iterations == 0:
-            routed_agent = "Was not able to route to hypothesis in six turns."
+            routed_agent = event.content.parts[0].function_call.args
 
     # The input should route to the search_agent.
     assert "hypothesis_agent" in str(routed_agent).lower(), (

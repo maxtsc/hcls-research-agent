@@ -12,6 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""LLM Auditor for verifying & refining LLM-generated answers using the web."""
+"""Research question agent improving the research agent."""
 
-from . import agent
+from google.adk import Agent
+
+from . import prompt
+
+research_question_agent = Agent(
+    model="gemini-2.5-flash",
+    name="research_question_agent",
+    instruction=prompt.RQ_PROMPT,
+    output_key="research_question",
+)

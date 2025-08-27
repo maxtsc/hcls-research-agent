@@ -1,20 +1,42 @@
-# HCLS Research Agent
+# hcls-research-agent
+
+## Overview
 
 Today, HCLS researchers need to process many documents from databases like pubmed to identify potential research hypotheses around their research question. This agent intends to automate this process.
 
 This project implements a multi-agent system for conducting Health and Life Sciences (HCLS) research using the Google Agent Development Kit (ADK).
 
-## Example Usage
+For details on GCP deployment, please read and follow the instructions at [`deploy/README.md`](deploy/README.md).
+
+## Agent Details
+
+### Key Features
+
 This section illustrates how a domain expert can use the HCLS Research Agent to accelerate their research workflow.
 
-### User Persona: The Clinical Researcher 👩🏽‍⚕️
+#### User Persona: The Clinical Researcher 👩🏽‍⚕️
 Our target user is a professional with deep domain expertise in health and life sciences, such as a clinical researcher, a medical science liaison, or a pharmacologist in an R&D department.
 
 Let's consider Dr. Anya Sharma, a clinical researcher specializing in oncology. Dr. Sharma is tasked with identifying potential new therapeutic areas for an existing antibody-drug conjugate. Her goal is to move beyond the drug's approved indications and find novel, "tumor-agnostic" applications based on molecular markers.
 
 Traditionally, this would involve days or weeks of manually searching PubMed, sifting through hundreds of papers, and synthesizing the findings. Dr. Sharma uses the HCLS Research Agent to automate this initial discovery phase.
 
-### Sample Interaction
+This interaction demonstrates the agent's core capabilities:
+* Understand Intent: The agent correctly interprets the user's complex initial query. Although the `research_question_agent` is available, it recognizes that the user has already provided a well-formed question.
+* Collaborative Search: The `search_agent` proposes a transparent, editable search query, allowing the expert user to approve or refine it. It intelligently adapts when the initial search yields no results.
+* Automated Synthesis: The agent retrieves and synthesizes information from multiple papers, presenting a concise summary with citations.
+* Hypothesis Generation: Finally, the `hypothesis_agent` uses the synthesized research to propose concrete, testable hypotheses, directly addressing the user's initial goal and providing a clear starting point for further investigation.
+
+### Architecture
+
+The system consists of a root agent that delegates tasks to the following specialized sub-agents:
+
+*   **research_question_agent**: Responsible for taking a topic and formulating a clear, answerable research question.
+*   **search_agent**: Performs searches to find relevant information and academic papers related to the research question. It utilizes the NCBI Entrez API to query the PubMed database.
+*   **hypothesis_agent**: Generates a hypothesis based on the gathered research.
+
+### Example Agent Interaction
+
 Here is a sample interaction showing how Dr. Sharma uses the agent to explore new indications for the drug "trastuzumab deruxtecan".
 |Actor|Message|
 |---|---|
@@ -29,74 +51,63 @@ Here is a sample interaction showing how Dr. Sharma uses the agent to explore ne
 |👩🏽‍⚕️ `user`| Yes|
 |🤖 `hypothesis_agent`| Based on the provided research summary, the following new hypotheses are proposed to address the research question:<br>* Hypothesis 1: Trastuzumab deruxtecan (T-DXd) will demonstrate a clinically meaningful objective response rate and durable disease control in a prospective clinical trial for patients with HER2-positive salivary duct carcinoma. (PMID: 40470107)<br>* Hypothesis 2: Trastuzumab deruxtecan (T-DXd) will exhibit significant anti-tumor activity, leading to improved progression-free survival, in patients with HER2-expressing desmoplastic small round cell tumors who have progressed on standard chemotherapy. (PMID: 39921935, PMID: 39120576)<br>* Hypothesis 3: Broad molecular profiling for HER2 expression across diverse rare and aggressive tumor types with unmet medical needs will identify additional novel indications where trastuzumab deruxtecan (T-DXd) can provide therapeutic benefit, even at lower HER2 expression levels. (PMID: 39689708, PMID: 40470107, PMID: 39921935, PMID: 39120576)|
 
-### Workflow Breakdown
-This interaction demonstrates the agent's core capabilities:
-* Understand Intent: The agent correctly interprets the user's complex initial query. Although the `research_question_agent` is available, it recognizes that the user has already provided a well-formed question.
-* Collaborative Search: The `search_agent` proposes a transparent, editable search query, allowing the expert user to approve or refine it. It intelligently adapts when the initial search yields no results.
-* Automated Synthesis: The agent retrieves and synthesizes information from multiple papers, presenting a concise summary with citations.
-* Hypothesis Generation: Finally, the `hypothesis_agent` uses the synthesized research to propose concrete, testable hypotheses, directly addressing the user's initial goal and providing a clear starting point for further investigation.
-
-## Agent Architecture
-
-The system consists of a root agent that delegates tasks to the following specialized sub-agents:
-
-*   **research_question_agent**: Responsible for taking a topic and formulating a clear, answerable research question.
-*   **search_agent**: Performs searches to find relevant information and academic papers related to the research question. It utilizes the NCBI Entrez API to query the PubMed database.
-*   **hypothesis_agent**: Generates a hypothesis based on the gathered research.
-
 ## Setup and Installation
 
-This project uses [Poetry](https://python-poetry.org/) for dependency management.
+### Prerequisites
 
-1.  **Install Poetry:**
-    ```bash
-    pip install poetry
-    ```
+- **Google Credentials:** You need a GCP project _or_ Gemini API key for local testing. You need a GCP project for deployment to Cloud Run.
+- **UV:** Ensure that you have uv installed. If you don't already, please follow the installation instructions at [https://docs.astral.sh/uv/getting-started/installation/](https://docs.astral.sh/uv/getting-started/installation/).
 
-2.  **Install Project Dependencies:**
-    ```bash
-    poetry install
-    ```
+### Project Setup
 
-3.  **Set up Environment Variables:**
-    Create a `.env` file by copying the template:
-    ```bash
-    cp .env.copy .env
-    ```
-    Then, fill in the required values in the new `.env` file.
+1. **Install dependencies in a virtual environment:** `make install`
 
-4.  **Authenticate with Google Cloud:**
-    Run the following command to authenticate your local environment.
-    ```bash
-    poetry run gcloud auth application-default login
-    ```
+1. **Run static code analysis:** `make check`
+
+1. **Set up Environment Variables:** Create a file named `.env` and update values as needed.
+
+	```bash
+	# If using API key: ML Dev backend config.
+	GOOGLE_API_KEY=YOUR_VALUE_HERE
+	GOOGLE_GENAI_USE_VERTEXAI=false
+
+	# If using Vertex on GCP: Vertex backend config
+	GOOGLE_CLOUD_PROJECT=YOUR_VALUE_HERE
+	GOOGLE_CLOUD_LOCATION=YOUR_VALUE_HERE
+	GOOGLE_GENAI_USE_VERTEXAI=true
+	```
+
+1. **If you're using a GCP project, authenticate with GCP and enable VertexAI:**
+
+	```bash
+	gcloud auth login --update-adc
+	gcloud config set project PROJECT_ID
+	gcloud services enable aiplatform.googleapis.com
+	```
+
+You are now ready to start development on your project!
 
 ## Running the Agent
 
-You can interact with the agent using the ADK web UI or the command-line runner.
+Run the agent(s) API server with the command: `make api_server`
 
-### Web UI
+Run the agent with the ADK Web UI with the command: `make web`
 
-To start the interactive web interface, run:
+## Running Tests
 
-```bash
-poetry run adk web
-```
+Tests assess the overall executability of the agents. All tests are located under the `tests/` directory.
 
-Then, open your browser to `http://localhost:8000`.
+Run tests with the command `make test`
 
-### Command-Line Runner
+## Deploying the Agent
 
-To interact with the agent directly from your terminal, run:
+The root `agent-packs` [guide](cs/h/pso-internal/agent-packs) includes comprehensive instructions on agent deployment. A basic workflow might look like:
 
-```bash
-poetry run adk run hcls_research_agent
-```
+1. Create or update the `deploy.adk.yaml` file in this directory.
+1. (One time only) Run `uv run agent-packs adk setup` to initialize the build environment.
+1. Run a complete end-to-end deployment with `uv run agent-packs adk deploy-all`.
+1. Run a proxy to access the deployed endpoint on localhost. This can be done by running: `gcloud run services proxy {SERVICE_NAME} --region {REGION} --project {PROJECT}`.
 
-## Testing the Agent
+---
 
-To run the test suite, use the following command:
-
-```bash
-poetry run pytest tests
-```
+Repository initiated with [agent-packs](cs/h/pso-internal/agent-packs).

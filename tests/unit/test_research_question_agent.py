@@ -16,14 +16,15 @@
 
 from unittest.mock import patch
 
+import pytest
 from google.adk.models import LlmResponse
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
 from google.genai.types import Content, Part
+
 from agents.hcls_research_agent.sub_agents.research_question_agent.agent import (
     research_question_agent,
 )
-import pytest
 
 
 @pytest.mark.asyncio
@@ -89,9 +90,7 @@ async def test_vague_research_question():
 
     # Mock the LLM response
     async def mock_generate_content_async(*args, **kwargs):
-        yield LlmResponse(
-            content=Content(parts=[Part(text=expected_refined_question)])
-        )
+        yield LlmResponse(content=Content(parts=[Part(text=expected_refined_question)]))
 
     with patch(
         "google.adk.models.Gemini.generate_content_async",
@@ -132,9 +131,7 @@ async def test_simple_research_question():
 
     # Mock the LLM response
     async def mock_generate_content_async(*args, **kwargs):
-        yield LlmResponse(
-            content=Content(parts=[Part(text=expected_refined_question)])
-        )
+        yield LlmResponse(content=Content(parts=[Part(text=expected_refined_question)]))
 
     with patch(
         "google.adk.models.Gemini.generate_content_async",

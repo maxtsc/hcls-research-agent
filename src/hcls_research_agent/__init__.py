@@ -12,6 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Agent for revising user research questions."""
+"""LLM Auditor for verifying & refining LLM-generated answers using the web."""
 
-from .agent import research_question_agent
+from . import agent as agent

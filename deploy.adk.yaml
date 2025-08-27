@@ -1,0 +1,10 @@
+source_dir: "/Users/mtschochohei/Coding/hcls-research-agent-corp/agent-packs/starter_packs/hcls/hcls-research-agent"
+data_project: "agent-catalog-demo-1"
+agent_project: "agent-catalog-demo-1"
+service_name: "hcls-research-agent"
+container_name: "hcls-research-agent"
+state_bucket: "agent-catalog-demo-1_us-central1_cloudbuild"
+vars:
+    GOOGLE_CLOUD_PROJECT: "agent-catalog-demo-1"
+    GOOGLE_CLOUD_LOCATION: "global"
+    GOOGLE_GENAI_USE_VERTEXAI: "true"
