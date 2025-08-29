@@ -1,11 +1,10 @@
 ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
-DEPLOYMENT_CONFIG := $(ROOT_DIR)/deploy.adk.yaml
 TESTPATH := $(ROOT_DIR)/tests/
 
 .PHONY: install
 install: # Install virtual environment with uv
 	@echo "🚀 Creating virtual environment using uv"
-	@uv syncuv
+	@uv sync
 
 .PHONY: check
 check: # Check lock file consistency and run static code analysis
@@ -34,7 +33,7 @@ web: # Run the ADK web demo server
 
 .PHONY: api_server
 api_server: # Run the ADK FastAPI server
-	@uv run adk api_server src/agents/l
+	@uv run adk api_server src/agents/
 
 .PHONY: help
 help:
@@ -42,16 +41,3 @@ help:
 	[[print(f'\033[36m{m[0]:<20}\033[0m {m[1]}') for m in re.findall(r'^([a-zA-Z_-]+):.*?## (.*)$$', open(makefile).read(), re.M)] for makefile in ('$(MAKEFILE_LIST)').strip().split()]"
 
 .DEFAULT_GOAL := help
-
-.PHONY: build
-build: # Setup a deployment environment to run builds and deploy to Cloud Run.
-	@cd ../../../ && uv run agent-packs adk build --config-file $(DEPLOYMENT_CONFIG)
-
-.PHONY: deploy-all
-deploy-all: # Run all deployment steps to provision infrastructure, build a Docker image, and deploy to Cloud Run.
-	@cd ../../../ && uv run agent-packs adk deploy-all --config-file $(DEPLOYMENT_CONFIG)
-
-.PHONY: deploy
-deploy: # Run all deployment steps to provision infrastructure, build a Docker image, and deploy to Cloud Run.
-	@cd ../../../ && uv run agent-packs adk deploy --config-file $(DEPLOYMENT_CONFIG)
-
