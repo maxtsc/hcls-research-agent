@@ -6,8 +6,6 @@ Today, HCLS researchers need to process many documents from databases like pubme
 
 This project implements a multi-agent system for conducting Health and Life Sciences (HCLS) research using the Google Agent Development Kit (ADK).
 
-For details on GCP deployment, please read and follow the instructions at [`deploy/README.md`](deploy/README.md).
-
 ## Agent Details
 
 ### Key Features
@@ -15,6 +13,7 @@ For details on GCP deployment, please read and follow the instructions at [`depl
 This section illustrates how a domain expert can use the HCLS Research Agent to accelerate their research workflow.
 
 #### User Persona: The Clinical Researcher 👩🏽‍⚕️
+
 Our target user is a professional with deep domain expertise in health and life sciences, such as a clinical researcher, a medical science liaison, or a pharmacologist in an R&D department.
 
 Let's consider Dr. Anya Sharma, a clinical researcher specializing in oncology. Dr. Sharma is tasked with identifying potential new therapeutic areas for an existing antibody-drug conjugate. Her goal is to move beyond the drug's approved indications and find novel, "tumor-agnostic" applications based on molecular markers.
@@ -22,18 +21,19 @@ Let's consider Dr. Anya Sharma, a clinical researcher specializing in oncology. 
 Traditionally, this would involve days or weeks of manually searching PubMed, sifting through hundreds of papers, and synthesizing the findings. Dr. Sharma uses the HCLS Research Agent to automate this initial discovery phase.
 
 This interaction demonstrates the agent's core capabilities:
-* Understand Intent: The agent correctly interprets the user's complex initial query. Although the `research_question_agent` is available, it recognizes that the user has already provided a well-formed question.
-* Collaborative Search: The `search_agent` proposes a transparent, editable search query, allowing the expert user to approve or refine it. It intelligently adapts when the initial search yields no results.
-* Automated Synthesis: The agent retrieves and synthesizes information from multiple papers, presenting a concise summary with citations.
-* Hypothesis Generation: Finally, the `hypothesis_agent` uses the synthesized research to propose concrete, testable hypotheses, directly addressing the user's initial goal and providing a clear starting point for further investigation.
+
+- Understand Intent: The agent correctly interprets the user's complex initial query. Although the `research_question_agent` is available, it recognizes that the user has already provided a well-formed question.
+- Collaborative Search: The `search_agent` proposes a transparent, editable search query, allowing the expert user to approve or refine it. It intelligently adapts when the initial search yields no results.
+- Automated Synthesis: The agent retrieves and synthesizes information from multiple papers, presenting a concise summary with citations.
+- Hypothesis Generation: Finally, the `hypothesis_agent` uses the synthesized research to propose concrete, testable hypotheses, directly addressing the user's initial goal and providing a clear starting point for further investigation.
 
 ### Architecture
 
 The system consists of a root agent that delegates tasks to the following specialized sub-agents:
 
-*   **research_question_agent**: Responsible for taking a topic and formulating a clear, answerable research question.
-*   **search_agent**: Performs searches to find relevant information and academic papers related to the research question. It utilizes the NCBI Entrez API to query the PubMed database.
-*   **hypothesis_agent**: Generates a hypothesis based on the gathered research.
+- **research_question_agent**: Responsible for taking a topic and formulating a clear, answerable research question.
+- **search_agent**: Performs searches to find relevant information and academic papers related to the research question. It utilizes the NCBI Entrez API to query the PubMed database.
+- **hypothesis_agent**: Generates a hypothesis based on the gathered research.
 
 ### Example Agent Interaction
 
@@ -47,9 +47,9 @@ Here is a sample interaction showing how Dr. Sharma uses the agent to explore ne
 |👩🏽‍⚕️ `user`| I'm fine with this|
 |🤖 `search_agent`| Great. Before I proceed with the search, I need your email address. This is required to access the Entrez API for logging purposes.|
 |👩🏽‍⚕️ `user`| test@gmail.com|
-|🤖 `search_agent`| I have successfully completed my search.<br> Search Summary for `("trastuzumab deruxtecan" OR "T-DXd") AND ("new indications" OR "potential indications" OR "other cancers" OR "unmet need")`<br>Number of articles reviewed: 6<br>Based on a review of the abstracts from the top 6 articles found on PubMed, here is a summary of the key findings regarding underexplored disease entities for trastuzumab deruxtecan (T-DXd) where it is not currently an approved therapy:<br>* Potential in Salivary Duct Carcinoma (SDC): A case report suggests that trastuzumab deruxtecan may offer interesting disease control in patients with HER2-positive salivary duct carcinoma... [PMID 40470107]<br>* Efficacy in Desmoplastic Small Round Cell Tumors (DSRCTs): Two studies indicate that T-DXd shows significant activity in desmoplastic small round cell tumors (DSRCTs)... [PMID 39921935, PMID 39120576]<br>* General Context for New Indications: ...the emergence of case reports and preclinical data in other rare cancers suggests a broader potential beyond current approvals... [PMID 39689708]<br>* Overall Conclusion: The literature review indicates that while trastuzumab deruxtecan is well-established in certain HER2-expressing cancers, there is emerging evidence supporting its potential in underexplored, aggressive rare cancers such as Salivary Duct Carcinoma and Desmoplastic Small Round Cell Tumors...<br>Would you like to generate hypotheses based on these results now?|
+|🤖 `search_agent`| I have successfully completed my search.<br> Search Summary for `("trastuzumab deruxtecan" OR "T-DXd") AND ("new indications" OR "potential indications" OR "other cancers" OR "unmet need")`<br>Number of articles reviewed: 6<br>Based on a review of the abstracts from the top 6 articles found on PubMed, here is a summary of the key findings regarding underexplored disease entities for trastuzumab deruxtecan (T-DXd) where it is not currently an approved therapy:<br>_ Potential in Salivary Duct Carcinoma (SDC): A case report suggests that trastuzumab deruxtecan may offer interesting disease control in patients with HER2-positive salivary duct carcinoma... [PMID 40470107]<br>_ Efficacy in Desmoplastic Small Round Cell Tumors (DSRCTs): Two studies indicate that T-DXd shows significant activity in desmoplastic small round cell tumors (DSRCTs)... [PMID 39921935, PMID 39120576]<br>_ General Context for New Indications: ...the emergence of case reports and preclinical data in other rare cancers suggests a broader potential beyond current approvals... [PMID 39689708]<br>_ Overall Conclusion: The literature review indicates that while trastuzumab deruxtecan is well-established in certain HER2-expressing cancers, there is emerging evidence supporting its potential in underexplored, aggressive rare cancers such as Salivary Duct Carcinoma and Desmoplastic Small Round Cell Tumors...<br>Would you like to generate hypotheses based on these results now?|
 |👩🏽‍⚕️ `user`| Yes|
-|🤖 `hypothesis_agent`| Based on the provided research summary, the following new hypotheses are proposed to address the research question:<br>* Hypothesis 1: Trastuzumab deruxtecan (T-DXd) will demonstrate a clinically meaningful objective response rate and durable disease control in a prospective clinical trial for patients with HER2-positive salivary duct carcinoma. (PMID: 40470107)<br>* Hypothesis 2: Trastuzumab deruxtecan (T-DXd) will exhibit significant anti-tumor activity, leading to improved progression-free survival, in patients with HER2-expressing desmoplastic small round cell tumors who have progressed on standard chemotherapy. (PMID: 39921935, PMID: 39120576)<br>* Hypothesis 3: Broad molecular profiling for HER2 expression across diverse rare and aggressive tumor types with unmet medical needs will identify additional novel indications where trastuzumab deruxtecan (T-DXd) can provide therapeutic benefit, even at lower HER2 expression levels. (PMID: 39689708, PMID: 40470107, PMID: 39921935, PMID: 39120576)|
+|🤖 `hypothesis_agent`| Based on the provided research summary, the following new hypotheses are proposed to address the research question:<br>_ Hypothesis 1: Trastuzumab deruxtecan (T-DXd) will demonstrate a clinically meaningful objective response rate and durable disease control in a prospective clinical trial for patients with HER2-positive salivary duct carcinoma. (PMID: 40470107)<br>_ Hypothesis 2: Trastuzumab deruxtecan (T-DXd) will exhibit significant anti-tumor activity, leading to improved progression-free survival, in patients with HER2-expressing desmoplastic small round cell tumors who have progressed on standard chemotherapy. (PMID: 39921935, PMID: 39120576)<br>\* Hypothesis 3: Broad molecular profiling for HER2 expression across diverse rare and aggressive tumor types with unmet medical needs will identify additional novel indications where trastuzumab deruxtecan (T-DXd) can provide therapeutic benefit, even at lower HER2 expression levels. (PMID: 39689708, PMID: 40470107, PMID: 39921935, PMID: 39120576)|
 
 ## Setup and Installation
 
@@ -66,24 +66,24 @@ Here is a sample interaction showing how Dr. Sharma uses the agent to explore ne
 
 1. **Set up Environment Variables:** Create a file named `.env` and update values as needed.
 
-	```bash
-	# If using API key: ML Dev backend config.
-	GOOGLE_API_KEY=YOUR_VALUE_HERE
-	GOOGLE_GENAI_USE_VERTEXAI=false
+   ```bash
+    GOOGLE_GENAI_USE_VERTEXAI="1"
+    GOOGLE_CLOUD_PROJECT="your-gcp-project"
+    GOOGLE_CLOUD_LOCATION="us-central1"
 
-	# If using Vertex on GCP: Vertex backend config
-	GOOGLE_CLOUD_PROJECT=YOUR_VALUE_HERE
-	GOOGLE_CLOUD_LOCATION=YOUR_VALUE_HERE
-	GOOGLE_GENAI_USE_VERTEXAI=true
-	```
+    AGENTENGINE_GCP_PROJECT="your-gcp-project"
+    AGENTENGINE_STAGING_BUCKET="your-gcp-bucket"
+
+    AGENTSPACE_GCP_PROJECT="your-gcp-project"
+   ```
 
 1. **If you're using a GCP project, authenticate with GCP and enable VertexAI:**
 
-	```bash
-	gcloud auth login --update-adc
-	gcloud config set project PROJECT_ID
-	gcloud services enable aiplatform.googleapis.com
-	```
+   ```bash
+   gcloud auth login --update-adc
+   gcloud config set project PROJECT_ID
+   gcloud services enable aiplatform.googleapis.com
+   ```
 
 You are now ready to start development on your project!
 
@@ -98,16 +98,3 @@ Run the agent with the ADK Web UI with the command: `make web`
 Tests assess the overall executability of the agents. All tests are located under the `tests/` directory.
 
 Run tests with the command `make test`
-
-## Deploying the Agent
-
-The root `agent-packs` [guide](cs/h/pso-internal/agent-packs) includes comprehensive instructions on agent deployment. A basic workflow might look like:
-
-1. Create or update the `deploy.adk.yaml` file in this directory.
-1. (One time only) Run `uv run agent-packs adk setup` to initialize the build environment.
-1. Run a complete end-to-end deployment with `uv run agent-packs adk deploy-all`.
-1. Run a proxy to access the deployed endpoint on localhost. This can be done by running: `gcloud run services proxy {SERVICE_NAME} --region {REGION} --project {PROJECT}`.
-
----
-
-Repository initiated with [agent-packs](cs/h/pso-internal/agent-packs).
